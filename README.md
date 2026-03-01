@@ -1,37 +1,49 @@
 # search-opensearch
 
-`search` 的 OpenSearch 驱动。
+`search-opensearch` 是 `search` 模块的 `opensearch` 驱动。
 
-驱动名：`opensearch`
+## 安装
 
-## 使用
+```bash
+go get github.com/infrago/search@latest
+go get github.com/infrago/search-opensearch@latest
+```
+
+## 接入
 
 ```go
-import _ "github.com/infrago/search-opensearch"
+import (
+    _ "github.com/infrago/search"
+    _ "github.com/infrago/search-opensearch"
+    "github.com/infrago/infra"
+)
+
+func main() {
+    infra.Run()
+}
 ```
+
+## 配置示例
 
 ```toml
 [search]
 driver = "opensearch"
-prefix = "demo_"
-
-[search.setting]
-server = "http://127.0.0.1:9200"
-username = ""
-password = ""
-api_key = ""
 ```
 
-## 配置项
+## 公开 API（摘自源码）
 
-- `server`：OpenSearch 地址
-- `username/password`：Basic Auth（可选）
-- `api_key`：API Key（可选，优先于 basic auth）
-- `prefix`：索引名前缀（可选）
-- `timeout`：HTTP 超时（例如 `5s`）
+- `func (d *openSearchDriver) Connect(inst *search.Instance) (search.Connection, error)`
+- `func (c *openSearchConnection) Open() error  { return nil }`
+- `func (c *openSearchConnection) Close() error { return nil }`
+- `func (c *openSearchConnection) Capabilities() search.Capabilities`
+- `func (c *openSearchConnection) SyncIndex(name string, index search.Index) error`
+- `func (c *openSearchConnection) Clear(name string) error`
+- `func (c *openSearchConnection) Upsert(index string, rows []Map) error`
+- `func (c *openSearchConnection) Delete(index string, ids []string) error`
+- `func (c *openSearchConnection) Search(index string, query search.Query) (search.Result, error)`
+- `func (c *openSearchConnection) Count(index string, query search.Query) (int64, error)`
 
-## 映射说明
+## 排错
 
-1. 统一 `Search DSL` 会映射到 bool query + filter + sort + aggs + highlight。
-2. `facets` 映射为 `terms aggregation`。
-3. `Upsert/Delete` 使用 `_bulk`。
+- driver 未生效：确认模块段 `driver` 值与驱动名一致
+- 连接失败：检查 endpoint/host/port/鉴权配置
