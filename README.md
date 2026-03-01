@@ -1,49 +1,33 @@
 # search-opensearch
 
-`search-opensearch` 是 `search` 模块的 `opensearch` 驱动。
+`search-opensearch` 是 `github.com/infrago/search` 的**opensearch 驱动**。
 
-## 安装
+## 包定位
 
-```bash
-go get github.com/infrago/search@latest
-go get github.com/infrago/search-opensearch@latest
-```
+- 类型：驱动
+- 作用：把 `search` 模块的统一接口落到 `opensearch` 后端实现
 
-## 接入
+## 快速接入
 
 ```go
 import (
     _ "github.com/infrago/search"
     _ "github.com/infrago/search-opensearch"
-    "github.com/infrago/infra"
 )
-
-func main() {
-    infra.Run()
-}
 ```
-
-## 配置示例
 
 ```toml
 [search]
 driver = "opensearch"
 ```
 
-## 公开 API（摘自源码）
+## `setting` 专用配置项
 
-- `func (d *openSearchDriver) Connect(inst *search.Instance) (search.Connection, error)`
-- `func (c *openSearchConnection) Open() error  { return nil }`
-- `func (c *openSearchConnection) Close() error { return nil }`
-- `func (c *openSearchConnection) Capabilities() search.Capabilities`
-- `func (c *openSearchConnection) SyncIndex(name string, index search.Index) error`
-- `func (c *openSearchConnection) Clear(name string) error`
-- `func (c *openSearchConnection) Upsert(index string, rows []Map) error`
-- `func (c *openSearchConnection) Delete(index string, ids []string) error`
-- `func (c *openSearchConnection) Search(index string, query search.Query) (search.Result, error)`
-- `func (c *openSearchConnection) Count(index string, query search.Query) (int64, error)`
+配置位置：`[search].setting`
 
-## 排错
+- `timeout`
 
-- driver 未生效：确认模块段 `driver` 值与驱动名一致
-- 连接失败：检查 endpoint/host/port/鉴权配置
+## 说明
+
+- `setting` 仅对当前驱动生效，不同驱动键名可能不同
+- 连接失败时优先核对 `setting` 中 host/port/认证/超时等参数
